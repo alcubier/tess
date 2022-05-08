@@ -2,6 +2,11 @@ import { app, BrowserWindow, clipboard, dialog} from "electron";
 import * as fs from "original-fs";
 import * as path from 'path';
 import {ipcMain} from "electron";
+import { exec } from 'child_process';
+
+const pathLocation = __dirname;
+const tesseractPath = "\"C:/Program Files/Tesseract-OCR/tesseract.exe\"";
+let imagePath = '';
 
 app.on('ready', () => {
     console.log('App is ready');
@@ -17,32 +22,28 @@ app.on('ready', () => {
 
     const indexHTML = path.join(__dirname + '/index.html');
     win.loadFile(indexHTML).then(() => {
-            
+                
+        ipcMain.on('get-clipboard-image', (event) => {
+            const image = clipboard.readImage();
+            if (image) {
+                // write image to file
+                writeClipboardImageToFile(image);
+                console.log('Image written to file');
+                //update target image file path
+                imagePath = path.join(pathLocation + '/clipboard.png');
+                sendOutputToWindow(win);
+            }
+            else {
+                console.log('No image in clipboard');
+            }
+        });
+
+
+        ipcMain.on('get-image-path', (event) => {
+            getImagePathFromFileBrowser();
+            sendOutputToWindow(win);
+        });   
     }).catch(e => console.error(e));
-});
-
-const pathLocation = __dirname;
-let imagePath = "";
-
-// --- IPC Events ---
-
-ipcMain.on('get-clipboard-image', (event) => {
-    const image = clipboard.readImage();
-    if (image) {
-        // write image to file
-        writeClipboardImageToFile(image);
-        console.log('Image written to file');
-        //update target image file path
-        imagePath = path.join(pathLocation + '/clipboard.png');
-    }
-    else {
-        console.log('No image in clipboard');
-    }
-});
-
-
-ipcMain.on('get-image-path', (event) => {
-    getImagePathFromFileBrowser();
 });
 
 // --- Get Image Functions ---
@@ -64,7 +65,6 @@ function getImagePathFromFileBrowser() {
         }
         else {
             imagePath = result.filePaths[0];
-            console.log(imagePath);
         }
     })
     .catch((err: any) => {
