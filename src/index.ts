@@ -84,4 +84,31 @@ function writeClipboardImageToFile(image: Electron.NativeImage) {
 }
 
 
+async function runOCR(callback?: (outputText: string|null) => void) {
+    //execute command
+    const command = tesseractPath + ' ' + imagePath + ' -'; // output to stdout 
+    console.log(command);
+    await exec(command, (err: any, stdout: any, stderr: any) => {
+        if (err) {
+            console.error(err);
+        }
+        else {
+            console.log(stdout);
+            if (callback) { callback(stdout); }
+        }
+    });
+    
+}
 
+
+function sendOutputToWindow(window: BrowserWindow) {
+    runOCR((output) => {
+        console.log(output);
+        if (output) {
+            window.webContents.send('ocr-text', output);
+        }
+        else {
+            window.webContents.send('ocr-text', 'No text found');
+        }
+    });
+}
