@@ -5,10 +5,23 @@
     <script defer src="render.js"></script>
   </head>
   <body>
-    <div id="main">
-        <button id="clipboard-image-button">Get Image From Clipboard</button>
-        <button id="browse-image-button">Browse Images</button>
-        <textarea id="ocr-output-textarea" placeholder="Output..." rows="20" cols="50" readonly></textarea>
+    <div id="container" class="container">
+        <div id="header" class="header">
+            <img src="images/logo.png" alt="Tess" id="logo">
+            <button id="settings-btn">Settings</button>
+        </div>
+        <div id="main" class="main">
+            <div id="file-input">
+                <button id="clipboard-image-button">Get Image From Clipboard</button>
+                <button id="browse-image-button">Browse Images</button>
+            </div>
+            <div id="text-output">
+                <textarea id="ocr-output-textarea" placeholder="Output..." rows="20" cols="50" readonly></textarea>
+            </div>
+        </div>
+        <div id="footer" class="footer">
+            <p>2022 Tess</p>
+        </div>
     </div>
 </body>
 </html>
