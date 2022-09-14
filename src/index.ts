@@ -3,6 +3,7 @@ import * as fs from "original-fs";
 import * as path from 'path';
 import {ipcMain} from "electron";
 import { exec } from 'child_process';
+import Tesseract from "tesseract.js";
 
 const pathLocation = __dirname;
 const tesseractPath = "\"C:/Program Files/Tesseract-OCR/tesseract.exe\"";
@@ -86,16 +87,25 @@ function writeClipboardImageToFile(image: Electron.NativeImage) {
 
 async function runOCR(callback?: (outputText: string|null) => void) {
     //execute command
-    const command = tesseractPath + ' ' + imagePath + ' -'; // output to stdout 
-    console.log(command);
-    await exec(command, (err: any, stdout: any, stderr: any) => {
-        if (err) {
-            console.error(err);
-        }
-        else {
-            console.log(stdout);
-            if (callback) { callback(stdout); }
-        }
+    // const command = tesseractPath + ' ' + imagePath + ' -'; // output to stdout 
+    // console.log(command);
+    // await exec(command, (err: any, stdout: any, stderr: any) => {
+    //     if (err) {
+    //         console.error(err);
+    //     }
+    //     else {
+    //         console.log(stdout);
+    //         if (callback) { callback(stdout); }
+    //     }
+    // });
+
+    Tesseract.recognize(
+        imagePath,
+        'eng',
+        { logger: m => console.log(m) }
+      ).then(({ data: { text } }) => {
+        //console.log(text);
+        if (callback) { callback(text); }
     });
     
 }
